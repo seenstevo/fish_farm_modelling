@@ -7,16 +7,9 @@ import variables
 from growth_curve_functions import weight_from_time, time_from_weight, a, b, c, d, e, f
 from fishfarm import BatchHotHouse, BatchJacks
 
-def main():
-    
-    # assign all parameters set in variables file
-    fingerling_g = variables.fingerling_g
-    hothouse_max_d = variables.hothouse_max_d
-    hothhouse_weeks = variables.hothhouse_weeks
-    jacks_max_d = variables.jacks_max_d
-    target_weight = variables.target_weight
-    harvest_freq = variables.harvest_freq
-    batch_size = variables.batch_size
+def main(fingerling_g = variables.fingerling_g, hothouse_max_d = variables.hothouse_max_d, hothhouse_weeks = variables.hothhouse_weeks,
+         jacks_max_d = variables.jacks_max_d, target_weight = variables.target_weight, harvest_freq = variables.harvest_freq,
+         batch_size = variables.batch_size):
 
     # set week 1
     week = 0
@@ -162,8 +155,10 @@ def main():
 
 
 if __name__ == "__main__":
-    dataframe = main()
     
+    
+    dataframe = main()
+
     year_output = pd.DataFrame(dataframe,
                             columns = ['Week',
                                         'Hot House Batch Names',
@@ -183,7 +178,7 @@ if __name__ == "__main__":
                                         'Jacks Total Tanks',
                                         'Jacks Total Weight (kg)'])
 
+    year_output.to_csv("Year_Output.csv", index = False)
 
 
-    year_output.to_csv("Year_Ouput.csv", index = False)
 
