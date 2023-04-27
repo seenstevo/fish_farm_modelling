@@ -1,4 +1,5 @@
 import pandas as pd
+import numpy as np
 import sys
 
 sys.path.append('src')
@@ -37,6 +38,7 @@ def main(fingerling_g = variables.fingerling_g, hothouse_max_d = variables.hotho
         j_batch_tanks = []
         j_batch_fish_per_tank = []
         j_batch_densities = []
+        j_fish_moved = []
 
         # initialise batch name to delete
         to_delete_j = ''
@@ -49,6 +51,9 @@ def main(fingerling_g = variables.fingerling_g, hothouse_max_d = variables.hotho
             # update values pre step update
             j_batch_names.append(j_batch_name)
             j_batch_start_weight.append(j_batch_instance.weight)
+            # save pre-step values
+            j_prev_n_fish_tank = j_batch_instance.n_fish_tank
+            j_prev_n_tanks = j_batch_instance.n_tanks
             
             # update the instance
             j_batch_instance.week_step_updates()
@@ -58,6 +63,7 @@ def main(fingerling_g = variables.fingerling_g, hothouse_max_d = variables.hotho
             j_batch_densities.append(j_batch_instance.stocking_den)
             j_batch_tanks.append(j_batch_instance.n_tanks)
             j_batch_fish_per_tank.append(j_batch_instance.n_fish_tank)
+            j_fish_moved.append(j_batch_instance.total_fish_moved(j_prev_n_fish_tank, j_prev_n_tanks))
         
             
             if j_batch_instance.weight > target_weight:
@@ -72,6 +78,7 @@ def main(fingerling_g = variables.fingerling_g, hothouse_max_d = variables.hotho
         hh_batch_tanks = []
         hh_batch_fish_per_tank = []
         hh_batch_densities = []
+        hh_fish_moved = []
         
         # initialise batch name to delete
         to_delete_hh = ''
@@ -84,6 +91,9 @@ def main(fingerling_g = variables.fingerling_g, hothouse_max_d = variables.hotho
             # update values pre step update
             hh_batch_names.append(hh_batch_name)
             hh_batch_start_weight.append(hh_batch_instance.weight)
+            # save pre-step values
+            hh_prev_n_fish_tank = hh_batch_instance.n_fish_tank
+            hh_prev_n_tanks = hh_batch_instance.n_tanks
             
             # update the instance
             hh_batch_instance.week_step_updates()
@@ -93,11 +103,11 @@ def main(fingerling_g = variables.fingerling_g, hothouse_max_d = variables.hotho
             hh_batch_densities.append(hh_batch_instance.stocking_den)
             hh_batch_tanks.append(hh_batch_instance.n_tanks)
             hh_batch_fish_per_tank.append(hh_batch_instance.n_fish_tank)
+            hh_fish_moved.append(hh_batch_instance.total_fish_moved(hh_prev_n_fish_tank, hh_prev_n_tanks))
 
 
             # create a Jacks instance when Hot House time ends
             if hh_batch_instance.weeks == hothhouse_weeks:
-                # j_batch_name = "j_batch" + str(week)
                 j_batch_instance = BatchJacks(arrival_weight = hh_batch_instance.weight,
                                             max_stock_den = jacks_max_d,
                                             batch_size = hh_batch_instance.batch_size)
@@ -126,6 +136,7 @@ def main(fingerling_g = variables.fingerling_g, hothouse_max_d = variables.hotho
                         hh_batch_densities,
                         sum(hh_batch_tanks),
                         (hh_total_weight / 1000),
+                        hh_fish_moved,
                         j_batch_names,
                         j_batch_start_weight,
                         j_batch_end_weight,
@@ -134,6 +145,7 @@ def main(fingerling_g = variables.fingerling_g, hothouse_max_d = variables.hotho
                         j_batch_densities,
                         sum(j_batch_tanks),
                         (j_total_weight / 1000),
+                        j_fish_moved
                         ])
         
         
@@ -169,6 +181,7 @@ if __name__ == "__main__":
                                         'Hot House Batch Densities',
                                         'Hot House Total Tanks',
                                         'Hot House Total Weight (kg)',
+                                        'Hot House Total Fish Moved',
                                         'Jacks Batch Names',
                                         'Jacks Batch Start Weights (g)',
                                         'Jacks Batch End Weights (g)',
@@ -176,9 +189,31 @@ if __name__ == "__main__":
                                         'Jacks Fish Per Tank',
                                         'Jacks Batch Densities',
                                         'Jacks Total Tanks',
-                                        'Jacks Total Weight (kg)'])
+                                        'Jacks Total Weight (kg)',
+                                        'Jacks Total Fish Moved'])
 
     year_output.to_csv("Year_Output.csv", index = False)
+    # to get single batch report
+    maskhh = year_output['Hot House Batch Names'].apply(lambda x: 'batch0' in x)
+    maskj = year_output['Jacks Batch Names'].apply(lambda x: 'batch0' in x)
+    mask = (maskhh | maskj)
+    tmp = year_output[mask]
+    
+    def select_batch0(row):
+        new_row = []
+        for col in row:
+            if type(col) == list:
+                if len(col) > 0:
+                    new_row.append(col[0])
+                else:
+                    new_row.append("-")
+            else:
+                new_row.append(col)
+        return new_row
+    
+    tmp = tmp.apply(select_batch0, axis=0)
+
+    tmp.to_csv("SingleBatch.csv", index = False)
 
 
 
