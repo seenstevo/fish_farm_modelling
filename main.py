@@ -7,6 +7,7 @@ sys.path.append('src')
 import variables
 from growth_curve_functions import weight_from_time, time_from_weight, a, b, c, d, e, f
 from fishfarm import BatchHotHouse, BatchJacks
+import single_batch_report
 
 def main(fingerling_g = variables.fingerling_g, hothouse_max_d = variables.hothouse_max_d, hothhouse_weeks = variables.hothhouse_weeks,
          jacks_max_d = variables.jacks_max_d, target_weight = variables.target_weight, harvest_freq = variables.harvest_freq,
@@ -63,7 +64,7 @@ def main(fingerling_g = variables.fingerling_g, hothouse_max_d = variables.hotho
             j_batch_densities.append(j_batch_instance.stocking_den)
             j_batch_tanks.append(j_batch_instance.n_tanks)
             j_batch_fish_per_tank.append(j_batch_instance.n_fish_tank)
-            j_fish_moved.append(j_batch_instance.total_fish_moved(j_prev_n_fish_tank, j_prev_n_tanks))
+            j_fish_moved.append(j_batch_instance.total_fish_moved_tank(j_prev_n_fish_tank))
         
             
             if j_batch_instance.weight > target_weight:
@@ -103,7 +104,7 @@ def main(fingerling_g = variables.fingerling_g, hothouse_max_d = variables.hotho
             hh_batch_densities.append(hh_batch_instance.stocking_den)
             hh_batch_tanks.append(hh_batch_instance.n_tanks)
             hh_batch_fish_per_tank.append(hh_batch_instance.n_fish_tank)
-            hh_fish_moved.append(hh_batch_instance.total_fish_moved(hh_prev_n_fish_tank, hh_prev_n_tanks))
+            hh_fish_moved.append(hh_batch_instance.total_fish_moved_tank(hh_prev_n_fish_tank))
 
 
             # create a Jacks instance when Hot House time ends
@@ -193,27 +194,10 @@ if __name__ == "__main__":
                                         'Jacks Total Fish Moved'])
 
     year_output.to_csv("Year_Output.csv", index = False)
-    # to get single batch report
-    maskhh = year_output['Hot House Batch Names'].apply(lambda x: 'batch0' in x)
-    maskj = year_output['Jacks Batch Names'].apply(lambda x: 'batch0' in x)
-    mask = (maskhh | maskj)
-    tmp = year_output[mask]
     
-    def select_batch0(row):
-        new_row = []
-        for col in row:
-            if type(col) == list:
-                if len(col) > 0:
-                    new_row.append(col[0])
-                else:
-                    new_row.append("-")
-            else:
-                new_row.append(col)
-        return new_row
-    
-    tmp = tmp.apply(select_batch0, axis=0)
-
-    tmp.to_csv("SingleBatch.csv", index = False)
-
+    tmp = single_batch_report.select_area(year_output, 'Hot House')
+    print(tmp)
+    tmp = single_batch_report.select_area(year_output, 'Jacks')
+    print(tmp)
 
 
