@@ -62,14 +62,13 @@ class BatchHotHouse():
         return self.n_fish_tank, self.weight, self.n_tanks, self.stocking_den
     
     
-    def n_fish_thin_to_n_new_tanks(self, n_fish_previous, n_tanks_previous):
+    def total_fish_moved_tank(self, prev_n_fish_tank):
         '''
-        After each time step, how many fish should be taken from each tank and to how many new ones and therefore how many tanks do we pool
+        After each time step, how many fish are taken from each tank
         '''
-        n_fish_remove = n_fish_previous - self.n_fish_tank
-        n_new_tanks = self.n_tanks - n_tanks_previous
-        n_thin_batch_each_new_tank = self.n_fish_tank / n_fish_remove
-        return n_fish_remove, n_new_tanks, n_thin_batch_each_new_tank
+        # first we calculate how many fish are removed per tank
+        n_fish_remove_tank = prev_n_fish_tank - self.n_fish_tank
+        return n_fish_remove_tank
 
 
 
@@ -130,11 +129,10 @@ class BatchJacks():
         return self.n_fish_tank, self.weight, self.n_tanks, self.stocking_den
     
     
-    def n_fish_thin_to_n_new_tanks(self, n_fish_previous, n_tanks_previous):
+    def total_fish_moved_tank(self, prev_n_fish_tank):
         '''
-        After each time step, how many fish should be taken from each tank and to how many new ones and therefore how many tanks do we pool
+        After each time step, how many fish are taken from each tank
         '''
-        n_fish_remove = n_fish_previous - self.n_fish_tank
-        n_new_tanks = self.n_tanks - n_tanks_previous
-        n_thin_batch_each_new_tank = self.n_fish_tank / n_fish_remove
-        return n_fish_remove, n_new_tanks, n_thin_batch_each_new_tank
+        # first we calculate how many fish are removed per tank
+        n_fish_remove_tank = prev_n_fish_tank - self.n_fish_tank
+        return n_fish_remove_tank
