@@ -1,3 +1,6 @@
+import pandas as pd
+import numpy as np
+
 
 def select_batch0(row):
         new_row = []
@@ -12,17 +15,34 @@ def select_batch0(row):
         return new_row
 
 
-def select_area(full_df, area: str):
+def select_area(full_df):
     '''
     To just select rows and columns relating to single batch in hot house
     '''
-    mask_row = full_df[f'{area} Batch Names'].apply(lambda x: 'batch0' in x)
-    mask_col = [area in col for col in full_df.columns]
-    area_df = full_df.loc[mask_row, mask_col]  
+    hh_mask_row = full_df['Hot House Batch Names'].apply(lambda x: 'batch0' in x)
+    hh_mask_col = [(('Hot House' in col) and ('Batch Names' not in col)) for col in full_df.columns]
+    hh_df = full_df.loc[hh_mask_row, hh_mask_col]
+    hh_df['Farm_Area'] = 'Hot House'
+    hh_df = hh_df.apply(select_batch0, axis = 0).values
     
-    area_df = area_df.apply(select_batch0, axis = 0)
+    j_mask_row = full_df['Jacks Batch Names'].apply(lambda x: 'batch0' in x)
+    j_mask_col = [(('Jacks' in col) and ('Batch Names' not in col)) for col in full_df.columns]
+    j_df = full_df.loc[j_mask_row, j_mask_col]
+    j_df['Farm_Area'] = 'Jacks'
+    j_df = j_df.apply(select_batch0, axis = 0).values
     
-    return area_df
+    df = pd.DataFrame(np.concatenate([hh_df, j_df], axis = 0), 
+                      columns = ['Batch Start Weights (g)',
+                                 'Batch End Weights (g)',
+                                 'Batch Tanks',
+                                 'Fish Per Tank',
+                                 'Batch Densities',
+                                 'Total Tanks',
+                                 'Total Weight (kg)',
+                                 'Fish Moved Per Tank',
+                                 'Farm Area'])
+    
+    return df
 
 
 

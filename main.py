@@ -8,6 +8,7 @@ import variables
 from growth_curve_functions import weight_from_time, time_from_weight, a, b, c, d, e, f
 from fishfarm import BatchHotHouse, BatchJacks
 import single_batch_report
+import fish_moves_distribution
 
 def main(fingerling_g = variables.fingerling_g, hothouse_max_d = variables.hothouse_max_d, hothhouse_weeks = variables.hothhouse_weeks,
          jacks_max_d = variables.jacks_max_d, target_weight = variables.target_weight, harvest_freq = variables.harvest_freq,
@@ -52,9 +53,9 @@ def main(fingerling_g = variables.fingerling_g, hothouse_max_d = variables.hotho
             # update values pre step update
             j_batch_names.append(j_batch_name)
             j_batch_start_weight.append(j_batch_instance.weight)
+            
             # save pre-step values
             j_prev_n_fish_tank = j_batch_instance.n_fish_tank
-            j_prev_n_tanks = j_batch_instance.n_tanks
             
             # update the instance
             j_batch_instance.week_step_updates()
@@ -64,7 +65,7 @@ def main(fingerling_g = variables.fingerling_g, hothouse_max_d = variables.hotho
             j_batch_densities.append(j_batch_instance.stocking_den)
             j_batch_tanks.append(j_batch_instance.n_tanks)
             j_batch_fish_per_tank.append(j_batch_instance.n_fish_tank)
-            j_fish_moved.append(j_batch_instance.total_fish_moved_tank(j_prev_n_fish_tank))
+            j_fish_moved.append(j_batch_instance.total_fish_moved_tank(j_prev_n_fish_tank))         
         
             
             if j_batch_instance.weight > target_weight:
@@ -94,7 +95,7 @@ def main(fingerling_g = variables.fingerling_g, hothouse_max_d = variables.hotho
             hh_batch_start_weight.append(hh_batch_instance.weight)
             # save pre-step values
             hh_prev_n_fish_tank = hh_batch_instance.n_fish_tank
-            hh_prev_n_tanks = hh_batch_instance.n_tanks
+
             
             # update the instance
             hh_batch_instance.week_step_updates()
@@ -169,20 +170,19 @@ def main(fingerling_g = variables.fingerling_g, hothouse_max_d = variables.hotho
 
 if __name__ == "__main__":
     
-    
-    dataframe = main()
+    year_output = main()
 
-    year_output = pd.DataFrame(dataframe,
-                            columns = ['Week',
-                                        'Hot House Batch Names',
-                                        'Hot House Batch Start Weights (g)',
-                                        'Hot House Batch End Weights (g)',
-                                        'Hot House Batch Tanks',
+    year_output = pd.DataFrame(year_output,
+                               columns = ['Week',
+                                          'Hot House Batch Names',
+                                          'Hot House Batch Start Weights (g)',
+                                          'Hot House Batch End Weights (g)',
+                                          'Hot House Batch Tanks',
                                         'Hot House Fish Per Tank',
                                         'Hot House Batch Densities',
                                         'Hot House Total Tanks',
                                         'Hot House Total Weight (kg)',
-                                        'Hot House Total Fish Moved',
+                                        'Hot House Fish Moved Per Tank',
                                         'Jacks Batch Names',
                                         'Jacks Batch Start Weights (g)',
                                         'Jacks Batch End Weights (g)',
@@ -191,13 +191,26 @@ if __name__ == "__main__":
                                         'Jacks Batch Densities',
                                         'Jacks Total Tanks',
                                         'Jacks Total Weight (kg)',
-                                        'Jacks Total Fish Moved'])
-
+                                        'Jacks Fish Moved Per Tank'])
+    
+    # shift the fish moved column up one row
+    year_output['Hot House Fish Moved Per Tank'] = (year_output['Hot House Fish Moved Per Tank']
+                                                    .shift(periods = -1, fill_value = 0))
+    year_output['Jacks Fish Moved Per Tank'] = (year_output['Jacks Fish Moved Per Tank']
+                                                    .shift(periods = -1, fill_value = 0))
+    # save the full Year Report
     year_output.to_csv("Year_Output.csv", index = False)
     
-    tmp = single_batch_report.select_area(year_output, 'Hot House')
-    print(tmp)
-    tmp = single_batch_report.select_area(year_output, 'Jacks')
-    print(tmp)
-
-
+    # Generate single batch dataframe
+    batch_report = single_batch_report.select_area(year_output)
+    batch_report['Fish Move Probs'] = (batch_report['Fish Moved Per Tank'] / 
+                                       batch_report['Fish Per Tank'])
+    # save the single batch details to file
+    batch_report.to_csv("Single_Batch_Report_Card.csv")
+    
+    # Calculate the Probability of 0-n fish moves where n is the weeks of batch
+    fish_move_freq_probs = fish_moves_distribution.convolve_binomial(batch_report['Fish Move Probs'])
+    fish_move_freq_df = pd.DataFrame({'Number of Times Moved': range(len(fish_move_freq_probs)),
+                                      'Percentage': fish_move_freq_probs})
+    # save the distribution of fish moves to file
+    fish_move_freq_df.to_csv("Fish_Moved_Percentage_Distribution.csv", index = False)
