@@ -170,7 +170,6 @@ def main(fingerling_g = variables.fingerling_g, hothouse_max_d = variables.hotho
 
 if __name__ == "__main__":
     
-    
     year_output = main()
 
     year_output = pd.DataFrame(year_output,
@@ -199,7 +198,6 @@ if __name__ == "__main__":
                                                     .shift(periods = -1, fill_value = 0))
     year_output['Jacks Fish Moved Per Tank'] = (year_output['Jacks Fish Moved Per Tank']
                                                     .shift(periods = -1, fill_value = 0))
-
     # save the full Year Report
     year_output.to_csv("Year_Output.csv", index = False)
     
@@ -207,9 +205,12 @@ if __name__ == "__main__":
     batch_report = single_batch_report.select_area(year_output)
     batch_report['Fish Move Probs'] = (batch_report['Fish Moved Per Tank'] / 
                                        batch_report['Fish Per Tank'])
+    # save the single batch details to file
+    batch_report.to_csv("Single_Batch_Report_Card.csv")
     
     # Calculate the Probability of 0-n fish moves where n is the weeks of batch
     fish_move_freq_probs = fish_moves_distribution.convolve_binomial(batch_report['Fish Move Probs'])
     fish_move_freq_df = pd.DataFrame({'Number of Times Moved': range(len(fish_move_freq_probs)),
-                                      'Probability': fish_move_freq_probs})
-
+                                      'Percentage': fish_move_freq_probs})
+    # save the distribution of fish moves to file
+    fish_move_freq_df.to_csv("Fish_Moved_Percentage_Distribution.csv", index = False)
