@@ -6,10 +6,10 @@ weekly_weights = np.array([0.5, 2, 3.6, 5.6, 8, 11.2, 15.6, 21.6, 29.2, 38.4, 49
 
 fingerling_g = 2   # weight of each fingerling in grams
 hothouse_max_d = 12 # maximum density in the hot house in kg/m3
-hothouse_maxmin_d = 8   # the maximum that the lower bound can be, to reduce total moves at cost of space efficieny
-batch_size = 11000    # how many fish do we start with in Hot House
+hothouse_maxmin_d = 12   # the maximum that the lower bound can be, to reduce total moves at cost of space efficieny
+batch_size = 9800    # how many fish do we start with in Hot House
 hothhouse_weeks = 7 # total number of weeks spent in the hot house
 jacks_max_d = 24  # maximum density in Jack's in kg/m3
-jacks_maxmin_d = 16   # the maximum that the lower bound can be, to reduce total moves at cost of space efficieny
+jacks_maxmin_d = 24   # the maximum that the lower bound can be, to reduce total moves at cost of space efficieny
 target_weight = 440    # target weight for each fish at harvest (450g)
 harvest_freq = 1  # harvest frequency in weeks

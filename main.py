@@ -175,12 +175,13 @@ if __name__ == "__main__":
     
     year_output = main()
 
+    # now process the outputs
     year_output = pd.DataFrame(year_output,
-                               columns = ['Week',
-                                          'Hot House Batch Names',
-                                          'Hot House Batch Start Weights (g)',
-                                          'Hot House Batch End Weights (g)',
-                                          'Hot House Batch Tanks',
+                            columns = ['Week',
+                                        'Hot House Batch Names',
+                                        'Hot House Batch Start Weights (g)',
+                                        'Hot House Batch End Weights (g)',
+                                        'Hot House Batch Tanks',
                                         'Hot House Fish Per Tank',
                                         'Hot House Batch Densities',
                                         'Hot House Total Tanks',
@@ -207,13 +208,13 @@ if __name__ == "__main__":
     # Generate single batch dataframe
     batch_report = single_batch_report.select_area(year_output)
     batch_report['Fish Move Probs'] = (batch_report['Fish Moved Per Tank'] / 
-                                       batch_report['Fish Per Tank'])
+                                    batch_report['Fish Per Tank'])
     # save the single batch details to file
     batch_report.to_csv("Single_Batch_Report_Card.csv")
     
     # Calculate the Probability of 0-n fish moves where n is the weeks of batch
     fish_move_freq_probs = fish_moves_distribution.convolve_binomial(batch_report['Fish Move Probs'])
     fish_move_freq_df = pd.DataFrame({'Number of Times Moved': range(len(fish_move_freq_probs)),
-                                      'Percentage': fish_move_freq_probs})
+                                    'Percentage': fish_move_freq_probs})
     # save the distribution of fish moves to file
     fish_move_freq_df.to_csv("Fish_Moved_Percentage_Distribution.csv", index = False)
