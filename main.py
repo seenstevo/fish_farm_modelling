@@ -10,9 +10,9 @@ from fishfarm import BatchHotHouse, BatchJacks
 import single_batch_report
 import fish_moves_distribution
 
-def main(fingerling_g = variables.fingerling_g, hothouse_max_d = variables.hothouse_max_d, hothhouse_weeks = variables.hothhouse_weeks,
-         jacks_max_d = variables.jacks_max_d, target_weight = variables.target_weight, harvest_freq = variables.harvest_freq,
-         batch_size = variables.batch_size):
+def main(fingerling_g = variables.fingerling_g, hothouse_max_d = variables.hothouse_max_d, hothouse_maxmin_d = variables.hothouse_maxmin_d,
+         hothhouse_weeks = variables.hothhouse_weeks, jacks_max_d = variables.jacks_max_d, jacks_maxmin_d = variables.jacks_maxmin_d, 
+         target_weight = variables.target_weight, harvest_freq = variables.harvest_freq, batch_size = variables.batch_size):
 
     # set week 1
     week = 0
@@ -28,9 +28,11 @@ def main(fingerling_g = variables.fingerling_g, hothouse_max_d = variables.hotho
         # create a new batch at the frequency set by harvest freq
         if (week % harvest_freq) == 0:
             batch_name = "batch" + str(week)
-            batch_instance = BatchHotHouse(fingerling_weight = fingerling_g, 
-                                        max_stock_den = hothouse_max_d, 
-                                        batch_size = batch_size)
+            batch_instance = BatchHotHouse(fingerling_weight = fingerling_g,
+                                           max_stock_den = hothouse_max_d,
+                                           maxmin_stock_den = hothouse_maxmin_d,
+                                           batch_size = batch_size,
+                                           max_weeks = hothhouse_weeks)
             hot_house_batch_dic[batch_name] = batch_instance
             
         ############################# Jacks ################################    
@@ -111,8 +113,9 @@ def main(fingerling_g = variables.fingerling_g, hothouse_max_d = variables.hotho
             # create a Jacks instance when Hot House time ends
             if hh_batch_instance.weeks == hothhouse_weeks:
                 j_batch_instance = BatchJacks(arrival_weight = hh_batch_instance.weight,
-                                            max_stock_den = jacks_max_d,
-                                            batch_size = hh_batch_instance.batch_size)
+                                              max_stock_den = jacks_max_d,
+                                              maxmin_stock_den = jacks_maxmin_d,
+                                              batch_size = hh_batch_instance.batch_size)
                 jacks_batch_dic[hh_batch_name] = j_batch_instance
                 # set this batch name to be deleted
                 to_delete_hh = hh_batch_name
@@ -172,12 +175,13 @@ if __name__ == "__main__":
     
     year_output = main()
 
+    # now process the outputs
     year_output = pd.DataFrame(year_output,
-                               columns = ['Week',
-                                          'Hot House Batch Names',
-                                          'Hot House Batch Start Weights (g)',
-                                          'Hot House Batch End Weights (g)',
-                                          'Hot House Batch Tanks',
+                            columns = ['Week',
+                                        'Hot House Batch Names',
+                                        'Hot House Batch Start Weights (g)',
+                                        'Hot House Batch End Weights (g)',
+                                        'Hot House Batch Tanks',
                                         'Hot House Fish Per Tank',
                                         'Hot House Batch Densities',
                                         'Hot House Total Tanks',
@@ -204,13 +208,13 @@ if __name__ == "__main__":
     # Generate single batch dataframe
     batch_report = single_batch_report.select_area(year_output)
     batch_report['Fish Move Probs'] = (batch_report['Fish Moved Per Tank'] / 
-                                       batch_report['Fish Per Tank'])
+                                    batch_report['Fish Per Tank'])
     # save the single batch details to file
     batch_report.to_csv("Single_Batch_Report_Card.csv")
     
     # Calculate the Probability of 0-n fish moves where n is the weeks of batch
     fish_move_freq_probs = fish_moves_distribution.convolve_binomial(batch_report['Fish Move Probs'])
     fish_move_freq_df = pd.DataFrame({'Number of Times Moved': range(len(fish_move_freq_probs)),
-                                      'Percentage': fish_move_freq_probs})
+                                    'Percentage': fish_move_freq_probs})
     # save the distribution of fish moves to file
     fish_move_freq_df.to_csv("Fish_Moved_Percentage_Distribution.csv", index = False)
