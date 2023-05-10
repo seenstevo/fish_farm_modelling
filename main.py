@@ -27,11 +27,10 @@ def main(fingerling_g = variables.fingerling_g, hothouse_max_d = variables.hotho
         # create a new batch at the frequency set by harvest freq
         if (week % harvest_freq) == 0:
             batch_name = "batch" + str(week)
-            batch_instance = BatchHotHouse(fingerling_weight = fingerling_g,
+            batch_instance = BatchHotHouse(weight = fingerling_g,
                                            max_stock_den = hothouse_max_d,
                                            maxmin_stock_den = hothouse_maxmin_d,
-                                           batch_size = batch_size,
-                                           max_weeks = hothhouse_weeks)
+                                           tank_vol = 1)
             hot_house_batch_dic[batch_name] = batch_instance
             
         ############################# Jacks ################################    
@@ -111,10 +110,10 @@ def main(fingerling_g = variables.fingerling_g, hothouse_max_d = variables.hotho
 
             # create a Jacks instance when Hot House time ends
             if hh_batch_instance.weeks == hothhouse_weeks:
-                j_batch_instance = BatchJacks(arrival_weight = hh_batch_instance.weight,
+                j_batch_instance = BatchJacks(weight = hh_batch_instance.weight,
                                               max_stock_den = jacks_max_d,
                                               maxmin_stock_den = jacks_maxmin_d,
-                                              batch_size = hh_batch_instance.batch_size)
+                                              tank_vol = 16)
                 jacks_batch_dic[hh_batch_name] = j_batch_instance
                 # set this batch name to be deleted
                 to_delete_hh = hh_batch_name
