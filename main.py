@@ -5,7 +5,6 @@ import sys
 sys.path.append('src')
 
 import variables
-from growth_curve_functions import weight_from_time, time_from_weight, a, b, c, d, e, f
 from fishfarm import BatchHotHouse, BatchJacks
 import single_batch_report
 import fish_moves_distribution

@@ -1,7 +1,6 @@
 from math import ceil
 
-from growth_curve_functions import weight_from_time, time_from_weight, n_for_max_density, a, b, c, d, e, f
-
+from growth_curve_functions import weight_from_time, time_from_weight, n_for_max_density
 
 class BatchHotHouse():
     
@@ -22,10 +21,10 @@ class BatchHotHouse():
     
     def initial_n_tanks(self):
         '''
-        Based on the batch size and the weight of the fish, how many tanks are needed to 
+        Based on the batch size and the weight of the fish, how many tanks are needed to start with
         '''
         # first find the t value based on weight before time step
-        t = time_from_weight(self.weight, a, b, c, d, e, f)
+        t = time_from_weight(self.weight)
         # what is the end weight after 1 week time step
         weight_after_week = round(weight_from_time(t+1), 2)
         # therefore what is max fish per tank
@@ -48,7 +47,7 @@ class BatchHotHouse():
             # save the previous weight
             previous_weight = self.weight
             # first find the t value based on weight before time step
-            t = time_from_weight(self.weight, a, b, c, d, e, f)
+            t = time_from_weight(self.weight)
             # update the weight after 1 week growth
             self.weight = round(weight_from_time(t + 1), 2)
             # max fish are needed per tank
@@ -86,7 +85,7 @@ class BatchHotHouse():
             # save the previous weight
             previous_weight = self.weight
             # first find the t value based on weight before time step
-            t = time_from_weight(self.weight, a, b, c, d, e, f)
+            t = time_from_weight(self.weight)
             # update the weight after 1 week growth
             self.weight = round(weight_from_time(t + 1), 2)
             # get the actual stocking density at start and end of time step
@@ -132,7 +131,7 @@ class BatchJacks():
         Based on the batch size and the weight of the fish, how many tanks are needed to 
         '''
         # first find the t value based on weight before time step
-        t = time_from_weight(self.weight, a, b, c, d, e, f)
+        t = time_from_weight(self.weight)
         # what is the end weight after 1 week time step
         weight_after_week = round(weight_from_time(t+1), 2)
         # therefore how many fish are needed for each tank
@@ -156,7 +155,7 @@ class BatchJacks():
             # save the previous weight
             previous_weight = self.weight
             # first find the t value based on weight before time step
-            t = time_from_weight(self.weight, a, b, c, d, e, f)
+            t = time_from_weight(self.weight)
             # update the weight after 1 week growth
             self.weight = round(weight_from_time(t + 1), 2)
             # max fish are needed per tank
@@ -191,7 +190,7 @@ class BatchJacks():
             # save the previous weight
             previous_weight = self.weight
             # first find the t value based on weight before time step
-            t = time_from_weight(self.weight, a, b, c, d, e, f)
+            t = time_from_weight(self.weight)
             # update the weight after 1 week growth
             self.weight = round(weight_from_time(t + 1), 2)
             # get the actual stocking density at start and end of time step

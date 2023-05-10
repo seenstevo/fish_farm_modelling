@@ -34,7 +34,7 @@ def weight_from_time(t):
 
 
 # inverse equation to find time (weeks) from a given weight
-def time_from_weight(weight, a, b, c, d, e, f):
+def time_from_weight(weight):
     '''
     Given a certain weight, what is the time
     '''
