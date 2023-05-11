@@ -13,3 +13,5 @@ jacks_max_d = 24  # maximum density in Jack's in kg/m3
 jacks_maxmin_d = 24   # the maximum that the lower bound can be, to reduce total moves at cost of space efficieny
 target_weight = 440    # target weight for each fish at harvest (450g)
 harvest_freq = 1  # harvest frequency in weeks
+hothouse_tank_vol = 1  # size in m3 of each tank
+jacks_tank_vol = 16  # size in m3 of each tank

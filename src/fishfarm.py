@@ -7,12 +7,12 @@ class BaseBatch():
     
     BATCH_SIZE = variables.batch_size
     
-    def __init__(self, weight, max_stock_den, maxmin_stock_den, tank_vol):
+    def __init__(self, weight, max_stock_den, maxmin_stock_den, tank_vol, weeks = 0):
         self.weight = weight
         self.max_stock_den = max_stock_den
         self.maxmin_stock_den = maxmin_stock_den
         self.tank_vol = tank_vol
-        self.weeks = 0
+        self.weeks = weeks
         self.stocking_den = None
         self.move = True
         self.n_tanks = None
@@ -162,6 +162,8 @@ class BatchJacks(BaseBatch):
         If not above this, we calculate the moves for single week of growth, if above, for 2 weeks
         If self.move == False, we simply update the weight and densities but do not move any fish as they are in a 2 week cycle
         '''
+        self.weeks += 1
+        
         if self.move:
             
             start_den, start_weight = self.week_move_calculations()
