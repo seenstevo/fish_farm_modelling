@@ -15,3 +15,5 @@ target_weight = 440    # target weight for each fish at harvest (450g)
 harvest_freq = 1  # harvest frequency in weeks
 hothouse_tank_vol = 1  # size in m3 of each tank
 jacks_tank_vol = 16  # size in m3 of each tank
+jacks_start_period_weeks = 4    # here we can specifiy that we want the fish to not be moved for x weeks upon arrival to Jacks
+jacks_end_two_weeks = 26    # this is the week, after which we enforce 2 week growth periods between moves
