@@ -16,4 +16,5 @@ harvest_freq = 1  # harvest frequency in weeks
 hothouse_tank_vol = 1  # size in m3 of each tank
 jacks_tank_vol = 16  # size in m3 of each tank
 jacks_start_period_weeks = 4    # here we can specifiy that we want the fish to not be moved for x weeks upon arrival to Jacks
-jacks_end_two_weeks = 26    # this is the week, after which we enforce 2 week growth periods between moves
+jacks_end_two_weeks = 19    # this is the week, after which we enforce 2 week growth periods between moves
+feed_schedule = 'specialised_aquatic_feeds_tilapia'

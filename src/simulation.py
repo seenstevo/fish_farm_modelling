@@ -140,23 +140,30 @@ def make_dataframe(dataframe):
     '''
     Simply take the list of lists and make a dataframe with column names
     '''
-    return pd.DataFrame(dataframe,
-                        columns = ['Week',
-                                   'Hot House Batch Names',
-                                   'Hot House Batch Start Weights (g)',
-                                   'Hot House Batch End Weights (g)',
-                                   'Hot House Batch Tanks',
-                                   'Hot House Fish Per Tank',
-                                   'Hot House Batch Densities',
-                                   'Hot House Total Tanks',
-                                   'Hot House Total Weight (kg)',
-                                   'Hot House Fish Moved Per Tank',
-                                   'Jacks Batch Names',
-                                   'Jacks Batch Start Weights (g)',
-                                   'Jacks Batch End Weights (g)',
-                                   'Jacks Batch Tanks',
-                                   'Jacks Fish Per Tank',
-                                   'Jacks Batch Densities',
-                                   'Jacks Total Tanks',
-                                   'Jacks Total Weight (kg)',
-                                   'Jacks Fish Moved Per Tank'])
+    year_output = pd.DataFrame(dataframe,
+                               columns = ['Week',
+                                          'Hot House Batch Names',
+                                          'Hot House Batch Start Weights (g)',
+                                          'Hot House Batch End Weights (g)',
+                                          'Hot House Batch Tanks',
+                                          'Hot House Fish Per Tank',
+                                          'Hot House Batch Densities',
+                                          'Hot House Total Tanks',
+                                          'Hot House Total Weight (kg)',
+                                          'Hot House Fish Moved Per Tank',
+                                          'Jacks Batch Names',
+                                          'Jacks Batch Start Weights (g)',
+                                          'Jacks Batch End Weights (g)',
+                                          'Jacks Batch Tanks',
+                                          'Jacks Fish Per Tank',
+                                          'Jacks Batch Densities',
+                                          'Jacks Total Tanks',
+                                          'Jacks Total Weight (kg)',
+                                          'Jacks Fish Moved Per Tank'])
+    # shift the fish moved column up one row to match up with the week end
+    year_output['Hot House Fish Moved Per Tank'] = (year_output['Hot House Fish Moved Per Tank']
+                                                    .shift(periods = -1, fill_value = 0))
+    year_output['Jacks Fish Moved Per Tank'] = (year_output['Jacks Fish Moved Per Tank']
+                                                    .shift(periods = -1, fill_value = 0))
+    
+    return year_output

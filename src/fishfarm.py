@@ -33,7 +33,7 @@ class BaseBatch():
         # therefore what is max fish per tank
         max_n_fish_tank = int(n_for_max_density(self.max_stock_den, weight_after_week, self.tank_vol))
         # Now we set the two values
-        self.n_tanks = self.custom_round(self.BATCH_SIZE / max_n_fish_tank)
+        self.n_tanks = self.custom_tank_round(self.BATCH_SIZE / max_n_fish_tank)
         self.n_fish_tank = int(self.BATCH_SIZE / self.n_tanks)
     
     
@@ -49,12 +49,11 @@ class BaseBatch():
         # max fish are needed per tank
         max_n_fish_tank = int(n_for_max_density(self.max_stock_den, self.weight, self.tank_vol))
         # update the number of tanks needed
-        self.n_tanks = self.custom_round(BaseBatch.BATCH_SIZE / max_n_fish_tank)
+        self.n_tanks = self.custom_tank_round(BaseBatch.BATCH_SIZE / max_n_fish_tank)
         # and divide the fish accordingly
         self.n_fish_tank = int(BaseBatch.BATCH_SIZE / self.n_tanks)
         # get the actual stocking density at start and end of time step
         self.start_end_stocking_density(start_weight, self.weight)
-        #start_den = round(((self.n_fish_tank * (start_weight / 1000)) / self.tank_vol), 2)
     
     
     def extra_week_setup(self, start_weight):
@@ -67,7 +66,7 @@ class BaseBatch():
         # max fish are needed per tank
         max_n_fish_tank = int(n_for_max_density(self.max_stock_den, extra_weeks_weight, self.tank_vol))
         # update the number of tanks needed
-        self.n_tanks = self.custom_round(BaseBatch.BATCH_SIZE / max_n_fish_tank)
+        self.n_tanks = self.custom_tank_round(BaseBatch.BATCH_SIZE / max_n_fish_tank)
         # and divide the fish accordingly
         self.n_fish_tank = int(BaseBatch.BATCH_SIZE / self.n_tanks)
         # get the actual stocking densities at start and end of time step
@@ -117,7 +116,7 @@ class BaseBatch():
         return (prev_step_n_fish_tank - self.n_fish_tank)
     
     
-    def custom_round(self, n_tank_float: float):
+    def custom_tank_round(self, n_tank_float: float):
         '''
         A way to set tank numbers with more fine grain
         '''
