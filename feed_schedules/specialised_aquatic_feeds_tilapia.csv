@@ -1,6 +1,5 @@
 fish_weight_lower,fish_weight_upper,percent_body_weight,feed_type
-0,0.5,29.4,Starter_#0
-0.5,1,13.9,Starter_#1
+0,1,13.9,Starter_#1
 1,5,8.7,Starter_#2
 5,15,6.7,Starter_#3
 15,30,5.3,PreGrower
