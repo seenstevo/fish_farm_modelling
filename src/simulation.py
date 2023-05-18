@@ -3,9 +3,12 @@ import pandas as pd
 import variables
 from fishfarm import BatchHotHouse, BatchJacks
 
+batch_size_value = None
 
-def simulation():
-
+def simulation(batch_size):
+    # set global variable batch_size
+    global batch_size_value
+    batch_size_value = batch_size
     # set week 1
     week = 0
 
@@ -24,7 +27,8 @@ def simulation():
                                            max_stock_den = variables.hothouse_max_d,
                                            maxmin_stock_den = variables.hothouse_maxmin_d,
                                            tank_vol = variables.hothouse_tank_vol,
-                                           weeks = 0)
+                                           weeks = 0,
+                                           batch_size = batch_size)
             # add the Hot House batch instance to dictionary
             hot_house_batch_dic[batch_name] = batch_instance
             
@@ -47,7 +51,8 @@ def simulation():
                                           max_stock_den = variables.jacks_max_d,
                                           maxmin_stock_den = variables.jacks_maxmin_d,
                                           tank_vol = variables.jacks_tank_vol,
-                                          weeks = weeks)
+                                          weeks = weeks,
+                                          batch_size = batch_size)
             jacks_batch_dic[batch_terminated] = j_batch_instance
         
         ############################ Final Steps per Week ###################################
@@ -84,8 +89,10 @@ def total_tonne(batch_end_weight: list):
     Sum up the total of all fish across all batches in a given week
     '''
     total = 0
+    # get the global variable batch_size
+    global batch_size_value
     for w in batch_end_weight:
-        total += (w * variables.batch_size)
+        total += (w * batch_size_value)
     return total / 1000
 
 

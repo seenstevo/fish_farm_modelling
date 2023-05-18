@@ -7,6 +7,7 @@ from simulation import simulation
 import single_batch_report
 import fish_moves_distribution
 import feeding_schedule_calculation
+import variables
 
 
 if __name__ == "__main__":
@@ -18,7 +19,7 @@ if __name__ == "__main__":
     '''
     ####################################################################
     # get the dataframe returned by the simulation function
-    year_output = simulation()
+    year_output = simulation(batch_size = variables.batch_size)
     # save the full Year Report
     year_output.to_csv("Year_Output.csv", index = False)
     
