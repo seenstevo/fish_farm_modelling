@@ -4,10 +4,10 @@ import sys
 sys.path.append('src')
 
 from simulation import simulation
+from batch_size_calculation import find_batch_size
 import single_batch_report
 import fish_moves_distribution
 import feeding_schedule_calculation
-import variables
 
 
 if __name__ == "__main__":
@@ -18,8 +18,8 @@ if __name__ == "__main__":
     3) The distribution of the frequency of moves allowing estimates of the trade off between greater space optimising and this source of fish stress
     '''
     ####################################################################
-    # get the dataframe returned by the simulation function
-    year_output = simulation(batch_size = variables.batch_size)
+    # run the batch_size_calculation function which uses the simulation to find max batch size that fits in Jacks
+    year_output = find_batch_size()
     # save the full Year Report
     year_output.to_csv("Year_Output.csv", index = False)
     

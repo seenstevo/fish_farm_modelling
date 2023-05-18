@@ -71,7 +71,8 @@ class BaseBatch():
         # get the actual stocking densities at start and end of time step
         self.start_end_stocking_density(start_weight, self.weight)
         # now set move to False so we simply get densities for next time step
-        self.move = False
+        if self.extra_weeks > 1:
+            self.move = False
     
     
     def stocking_density(self, weight):
@@ -118,10 +119,14 @@ class BaseBatch():
     def custom_tank_round(self, n_tank_float: float):
         '''
         A way to set tank numbers with more fine grain
+        Cutoff shifts depending on no of tanks
+        When only 1 or 2 tanks, decimal is larger proportion of total
         '''
         int_part = int(n_tank_float)
-        decimal_part = n_tank_float - int_part
-        if decimal_part > 0.2:
+        decimal_part = (n_tank_float - int_part)
+        # round_cutoff depends on int_part
+        round_cutoff = (int_part / variables.custom_round_denominator)
+        if decimal_part > round_cutoff:
             return (int_part + 1)
         else:
             if int_part == 0:
