@@ -19,7 +19,7 @@ if __name__ == "__main__":
     '''
     ####################################################################
     # run the batch_size_calculation function which uses the simulation to find max batch size that fits in Jacks
-    year_output = find_batch_size()
+    year_output, _ = find_batch_size()
     # save the full Year Report
     year_output.to_csv("Year_Output.csv", index = False)
     

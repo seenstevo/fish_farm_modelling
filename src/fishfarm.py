@@ -6,14 +6,16 @@ import variables
 
 class BaseBatch():
     
-    def __init__(self, weight, max_stock_den, maxmin_stock_den, tank_vol, batch_size, weeks = 0, extra_weeks = 0):
+    def __init__(self, weight, max_stock_den, maxmin_stock_den, tank_vol, batch_size, custom_round_denominator, hothhouse_weeks, weeks = 0):
         self.weight = weight
         self.max_stock_den = max_stock_den
         self.maxmin_stock_den = maxmin_stock_den
         self.tank_vol = tank_vol
         self.weeks = weeks
-        self.extra_weeks = extra_weeks
         self.batch_size = batch_size
+        self.custom_round_denominator = custom_round_denominator
+        self.hothhouse_weeks = hothhouse_weeks
+        self.extra_weeks = None
         self.stocking_den = None
         self.move = True
         self.n_tanks = None
@@ -57,7 +59,7 @@ class BaseBatch():
     
     def extra_week_setup(self, start_weight):
         # first find the t value based on weight before time step
-        t = time_from_weight(self.weight)
+        t = time_from_weight(start_weight)
         # update the weight after 1 week growth
         self.weight = round(weight_from_time(t + 1), 2)
         # update the weight after x extra weeks growth
@@ -125,7 +127,7 @@ class BaseBatch():
         int_part = int(n_tank_float)
         decimal_part = (n_tank_float - int_part)
         # round_cutoff depends on int_part
-        round_cutoff = (int_part / variables.custom_round_denominator)
+        round_cutoff = (int_part / self.custom_round_denominator)
         if decimal_part > round_cutoff:
             return (int_part + 1)
         else:
@@ -136,8 +138,6 @@ class BaseBatch():
     
     
 class BatchHotHouse(BaseBatch):
-    
-    MAX_WEEKS = variables.hothhouse_weeks
     
     def week_step_updates(self):
         '''
@@ -155,7 +155,7 @@ class BatchHotHouse(BaseBatch):
             
             # if starting density is too high (using a "max min") we will thin fish for 2 weeks growth
             # also checking if we have two weeks left in the hot house
-            if (self.stocking_den[0] > self.maxmin_stock_den) and (self.weeks < (BatchHotHouse.MAX_WEEKS - 1)):
+            if (self.stocking_den[0] > self.maxmin_stock_den) and (self.weeks < (self.hothhouse_weeks - 1)):
                 self.extra_weeks = 2
                 self.extra_week_setup(start_weight)
                 self.extra_weeks -= 1
@@ -166,6 +166,11 @@ class BatchHotHouse(BaseBatch):
           
     
 class BatchJacks(BaseBatch):
+    
+    def __init__(self, jacks_start_period_weeks, jacks_end_two_weeks, **kwargs):
+        super().__init__(**kwargs)
+        self.jacks_start_period_weeks = jacks_start_period_weeks
+        self.jacks_end_two_weeks = jacks_end_two_weeks
     
     def week_step_updates(self):
         '''
@@ -184,12 +189,12 @@ class BatchJacks(BaseBatch):
         if self.move:
             
             # then we hard code the first period in Jacks to be x weeks
-            if self.weeks == (variables.hothhouse_weeks + 1):
-                self.extra_weeks = variables.jacks_start_period_weeks
+            if self.weeks == (self.hothhouse_weeks + 1):
+                self.extra_weeks = self.jacks_start_period_weeks
                 self.extra_week_setup(self.weight)
                 self.extra_weeks -= 1
             
-            elif self.weeks >= variables.jacks_end_two_weeks:
+            elif self.weeks >= self.jacks_end_two_weeks:
                 self.extra_weeks = 2
                 self.extra_week_setup(self.weight)
                 self.extra_weeks -= 1

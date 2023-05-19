@@ -5,7 +5,12 @@ from fishfarm import BatchHotHouse, BatchJacks
 
 batch_size_value = None
 
-def simulation(batch_size):
+def simulation(batch_size, fingerling_g = variables.fingerling_g, hothouse_max_d = variables.hothouse_max_d, hothouse_maxmin_d = variables.hothouse_maxmin_d,
+               hothouse_tank_vol = variables.hothouse_tank_vol, harvest_freq = variables.harvest_freq, jacks_max_d = variables.jacks_max_d, 
+               jacks_maxmin_d = variables.jacks_maxmin_d, jacks_tank_vol = variables.jacks_tank_vol, hothhouse_weeks = variables.hothhouse_weeks,
+               target_weight = variables.target_weight, custom_round_denominator = variables.custom_round_denominator, 
+               jacks_start_period_weeks = variables.jacks_start_period_weeks, jacks_end_two_weeks = variables.jacks_end_two_weeks):
+    
     # set global variable batch_size
     global batch_size_value
     batch_size_value = batch_size
@@ -21,25 +26,27 @@ def simulation(batch_size):
 
     while True:
         # create a new batch at the frequency set by harvest freq
-        if (week % variables.harvest_freq) == 0:
+        if (week % harvest_freq) == 0:
             batch_name = "batch" + str(week)
-            batch_instance = BatchHotHouse(weight = variables.fingerling_g,
-                                           max_stock_den = variables.hothouse_max_d,
-                                           maxmin_stock_den = variables.hothouse_maxmin_d,
-                                           tank_vol = variables.hothouse_tank_vol,
+            batch_instance = BatchHotHouse(weight = fingerling_g,
+                                           max_stock_den = hothouse_max_d,
+                                           maxmin_stock_den = hothouse_maxmin_d,
+                                           tank_vol = hothouse_tank_vol,
                                            weeks = 0,
-                                           batch_size = batch_size)
+                                           batch_size = batch_size,
+                                           custom_round_denominator = custom_round_denominator,
+                                           hothhouse_weeks = hothhouse_weeks)
             # add the Hot House batch instance to dictionary
             hot_house_batch_dic[batch_name] = batch_instance
             
         ############################# Jacks ################################
-        jacks_row, batch_terminated = all_batch_update(jacks_batch_dic)
+        jacks_row, batch_terminated = all_batch_update(jacks_batch_dic, hothhouse_weeks, target_weight)
         
         if batch_terminated != "":
             to_delete_j = batch_terminated
 
         ######################### Hot House ###########################    
-        hothouse_row, batch_terminated = all_batch_update(hot_house_batch_dic)
+        hothouse_row, batch_terminated = all_batch_update(hot_house_batch_dic, hothhouse_weeks, target_weight)
         
         if batch_terminated != "":
             # set to remove batch from hot house 
@@ -48,11 +55,15 @@ def simulation(batch_size):
             weight = hot_house_batch_dic[batch_terminated].weight
             weeks = hot_house_batch_dic[batch_terminated].weeks
             j_batch_instance = BatchJacks(weight = weight,
-                                          max_stock_den = variables.jacks_max_d,
-                                          maxmin_stock_den = variables.jacks_maxmin_d,
-                                          tank_vol = variables.jacks_tank_vol,
+                                          max_stock_den = jacks_max_d,
+                                          maxmin_stock_den = jacks_maxmin_d,
+                                          tank_vol = jacks_tank_vol,
                                           weeks = weeks,
-                                          batch_size = batch_size)
+                                          batch_size = batch_size,
+                                          custom_round_denominator = custom_round_denominator,
+                                          hothhouse_weeks = hothhouse_weeks,
+                                          jacks_start_period_weeks = jacks_start_period_weeks,
+                                          jacks_end_two_weeks = jacks_end_two_weeks)
             jacks_batch_dic[batch_terminated] = j_batch_instance
         
         ############################ Final Steps per Week ###################################
@@ -67,13 +78,13 @@ def simulation(batch_size):
         # delete the batch from hot house dict
         try:
             del hot_house_batch_dic[to_delete_hh]
-        except UnboundLocalError:
+        except:
             pass
         
         # delete the batch from jack_dict
         try:
             del jacks_batch_dic[to_delete_j]
-        except UnboundLocalError:
+        except:
             pass
 
         # break out after 1 year
@@ -96,7 +107,7 @@ def total_tonne(batch_end_weight: list):
     return total / 1000
 
 
-def all_batch_update(batch_dic: dict):
+def all_batch_update(batch_dic: dict, hothhouse_weeks, target_weight):
     '''
     For Hot House or Jacks batches, we loop through each updating and saving values for the week
     We also return the name of a batch that has terminated (either time in hot house or reached size in Jacks)
@@ -133,7 +144,7 @@ def all_batch_update(batch_dic: dict):
         batch_fish_per_tank.append(batch_instance.n_fish_tank)
         fish_moved.append(batch_instance.total_fish_moved_tank(prev_n_fish_tank))
         
-        if (batch_instance.weeks == variables.hothhouse_weeks) or (batch_instance.weight > variables.target_weight):
+        if (batch_instance.weeks == hothhouse_weeks) or (batch_instance.weight > target_weight):
             batch_terminated = batch_name
 
     # summary calculations for all batches
