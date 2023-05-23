@@ -38,3 +38,18 @@ def get_feed_schedule_row(weight):
     # load feeding schedule file into pandas dataframe
     feed_schedule_df = pd.read_csv(f'./feed_schedules/{feed_schedule}.csv')
     return feed_schedule_df[(feed_schedule_df['fish_weight_lower'] < weight) & (feed_schedule_df['fish_weight_upper'] > weight)]
+
+
+def culmulative_feed(single_batch_report):
+    '''
+    Calculates the culmulative sum of feed per fish and then the FCR until harvest
+    '''
+    average_feed_per_tank = ((single_batch_report['Start Feed Per Tank (kg)'] + single_batch_report['End Feed Per Tank (kg)']) / 2) * 1000 * 7
+    single_batch_report['feed_per_fish_g'] = average_feed_per_tank / single_batch_report['Fish Per Tank']
+    single_batch_report['Cumulative Feed Per Fish (g)'] = single_batch_report['feed_per_fish_g'].cumsum()
+    single_batch_report['FCR'] = single_batch_report['Cumulative Feed Per Fish (g)'] / single_batch_report['Batch End Weights (g)']
+    single_batch_report['FCR'] = single_batch_report['FCR'].apply(lambda x: round(x, 2))
+    single_batch_report['Cumulative Feed Per Fish (g)'] = single_batch_report['Cumulative Feed Per Fish (g)'].apply(lambda x: round(x, 2))
+    single_batch_report = single_batch_report.drop(columns = ['feed_per_fish_g'])
+    return single_batch_report
+    
