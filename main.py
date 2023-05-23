@@ -33,7 +33,7 @@ if __name__ == "__main__":
     # Add the feed schedule columns to the single batch report
     batch_report = feeding_schedule_calculation.add_feed_schedule_columns(batch_report)
     # Add the culmulative feed and FCR columns
-    batch_report = feeding_schedule_calculation.culmulative_feed(batch_report)
+    batch_report = feeding_schedule_calculation.cumulative_feed(batch_report)
     
     # save the single batch details to file
     batch_report.to_csv("Single_Batch_Report_Card.csv")

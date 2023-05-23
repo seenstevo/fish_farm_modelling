@@ -40,7 +40,7 @@ def get_feed_schedule_row(weight):
     return feed_schedule_df[(feed_schedule_df['fish_weight_lower'] < weight) & (feed_schedule_df['fish_weight_upper'] > weight)]
 
 
-def culmulative_feed(single_batch_report):
+def cumulative_feed(single_batch_report):
     '''
     Calculates the culmulative sum of feed per fish and then the FCR until harvest
     '''
